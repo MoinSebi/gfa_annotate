@@ -17,7 +17,7 @@ fn main() {
     let matches = App::new("gfa_annotate")
         .version("0.1.0")
         .author("Sebastian V")
-        .about("Overlap annotation to a graph")
+        .about("Overlay annotation to a genome graph")
         .setting(AppSettings::ArgRequiredElseHelp)
         .arg(Arg::new("gfa")
             .short('g')
