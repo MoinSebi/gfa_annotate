@@ -2,14 +2,12 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs::File;
 use std::io::{Write, BufWriter};
-use std::ops::Bound::Included;
 use std::path::Path;
 use std::process;
-use std::time::Instant;
 use clap::{App, AppSettings, Arg};
 use gfaR_wrapper::NGfa;
 use log::{error, info};
-use crate::bed::{bed_entry, bed_file};
+use crate::bed::{BedFile};
 
 mod bed;
 
@@ -63,13 +61,16 @@ fn main() {
     }
 
     // Running the graph
+    info!("Read the gfa file");
     let mut graph = NGfa::new();
     graph.from_graph(gfa);
     let gfa2pos_btree = test(&graph);
 
     // Bed file
-    let bed = bed_file::readFile(bed);
+    info!("Read the gff/bed file");
+    let bed = BedFile::read_file(bed);
 
+    // For each genome
     let mut k: HashMap<&u32, (HashSet<String>, HashSet<String>)> = HashMap::new();
     for x in graph.nodes.iter(){
         k.insert(x.0, (HashSet::new(), HashSet::new()));
