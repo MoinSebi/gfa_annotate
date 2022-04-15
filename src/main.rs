@@ -45,7 +45,12 @@ fn main() {
 
     let gfa = matches.value_of("gfa").unwrap();
     let bed = matches.value_of("bed").unwrap();
-    let gff = matches.value_of("gff").expect("NO gff");
+    let gff ;
+    if matches.is_present("gff"){
+        gff = matches.value_of("gff").unwrap();
+    } else {
+        gff = "nothing";
+    }
 
     if !Path::new(gfa).exists(){
         error!("No gfa file");
@@ -58,7 +63,11 @@ fn main() {
 
     } else if !Path::new(gff).exists() {
         process::exit(0x0100);
+    } else {
+        let _bed = BedFile::read_bed(bed, ',');
+
     }
+
 
     // Running the graph
     info!("Read the gfa file");
@@ -68,7 +77,7 @@ fn main() {
 
     // Bed file
     info!("Read the gff/bed file");
-    let bed = BedFile::read_file(bed);
+    let bed = BedFile::read_gff(bed);
 
     // For each genome
     let mut k: HashMap<&u32, (HashSet<String>, HashSet<String>)> = HashMap::new();
