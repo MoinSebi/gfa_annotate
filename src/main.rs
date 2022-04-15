@@ -29,6 +29,14 @@ fn main() {
             .required(true)
             .about("bed file")
             .takes_value(true))
+        .arg(Arg::new("gff")
+            .long("gff")
+            .takes_value(true)
+            .about("GFF input"))
+        .arg(Arg::new("delimiter")
+            .about("Delimiter between features (in bed file)")
+            .takes_value(true)
+            .long("delimiter"))
         .arg(Arg::new("output")
             .short('o')
             .long("output")
@@ -39,6 +47,7 @@ fn main() {
 
     let gfa = matches.value_of("gfa").unwrap();
     let bed = matches.value_of("bed").unwrap();
+    let gff = matches.value_of("gff").expect("NO gff");
 
     if !Path::new(gfa).exists(){
         error!("No gfa file");
@@ -49,6 +58,8 @@ fn main() {
         error!("No bed file");
         process::exit(0x0100);
 
+    } else if !Path::new(gff).exists() {
+        process::exit(0x0100);
     }
 
     // Running the graph
