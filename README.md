@@ -2,17 +2,32 @@
 Overlay gene annotation from a gff format to the genome graph. Input format will change to bed.   
 
 
-## Input ([gff format](https://en.wikipedia.org/wiki/General_feature_format#:~:text=In%20bioinformatics%2C%20the%20general%20feature,DNA%2C%20RNA%20and%20protein%20sequences.)) 
-| Col | Type      | Description                        |
-|-----|-----------|------------------------------------|
-| 1   | String    | seqid                              |
-| 2   | String    | source                             |
-| 3   | String    | type                               |
-| 4   | String    | start                              |
-| 4   | String    | end                                |
-| 9   | String    | attributes (here are the gene ids) |
+## Input (bed format)
+| Col | Type   | Description |
+|-----|--------|-------------|
+| 1   | String | seqid       |
+| 2   | int    | start       |
+| 3   | int    | stop        |
+| 4   | String | Tags        |  
+
+
+####Tags (examples, semi-colon separated)
+- ID=Custom_identifier (1,2,3)
+- T=Type (Gene, mRNA)
+- G=Gene_name
+- OG=Orthogroup
+- More tags can be added with "=" (key, value pair)
+
+**Example** (tab-separated):  
+
+| TAIR10 | 100 | 200 | ID=1;T=gene;G=AT3G43160;C=Biosynthesis |
+|--------|-----|-----|----------------------------------------|
+
+####Comment: 
+Since it might be possible that the original GFF file has multiple **genes** in one interval, please separate this in the bed file ;)
 
 ## Output 
+
 | Col | Type         | Description |
 |-----|--------------|-------------|
 | 1   | int          | Node id     |
