@@ -1,80 +1,68 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::time::Instant;
+use log::info;
 
 pub struct BedFile {
     pub size: usize,
     pub jojo: HashMap<String, Vec<BedEntry>>
 }
 
-
 pub struct BedEntry {
     pub start: u32,
     pub end: u32,
-    pub kind: String,
-    pub gene: HashSet<String>,
+    pub tag: BTreeMap<String, String>,
 }
 
 impl BedFile {
-    /// Read a bed file from file
-    pub fn read_gff(filename: &str) -> Self{
-        let file = File::open(filename).expect("ERROR: CAN NOT READ FILE\n");
-        let reader = BufReader::new(file);
 
-        let mut hhiohi = HashMap::new();
-        for (_i, line) in reader.lines().enumerate() {
-            let l = line.unwrap();
-            let p: Vec<&str> = l.split("\t").collect();
-            if p.len() > 4 {
-                if p[2] == "gene"{
-                    let ko: Vec<&str> = p[8].split(";").collect();
-                    if ko.len() > 3{
-                        let ko2: Vec<&str> = ko[3].split("=").collect();
-                        let ko3: HashSet<String> = ko2.last().unwrap().split(",").map(|s| s.to_string()).collect();
-
-                        let bb = BedEntry {start: p[3].parse().unwrap(), end: p[4].parse().unwrap(), kind: p[2].to_string(), gene: ko3};
-
-                        hhiohi.entry(p[0].to_string()).or_insert(Vec::new()).push(bb);
-                    } else {
-                        let bb = BedEntry {start: p[3].parse().unwrap(), end: p[4].parse().unwrap(), kind: p[2].to_string(), gene: HashSet::new()};
-                        hhiohi.entry(p[0].to_string()).or_insert(Vec::new()).push(bb);
-                    }
-                } else {
-                    let bb = BedEntry {start: p[3].parse().unwrap(), end: p[4].parse().unwrap(), kind: p[2].to_string(), gene: HashSet::new()};
-                    hhiohi.entry(p[0].to_string()).or_insert(Vec::new()).push(bb);
-                }
-            }
-        }
-
+    pub fn new() -> Self{
         Self{
-            size: 10,
-            jojo: hhiohi,
-
+            size: 0,
+            jojo: HashMap::new(),
         }
     }
 
 
+    /// Reading a bed file
+    /// Format description in the README
     pub fn read_bed(filename: &str, del: char) -> Self{
+        info!("Reading bed file");
         let file = File::open(filename).expect("ERROR: CAN NOT READ FILE\n");
         let reader = BufReader::new(file);
 
         // Fasta_entry -> Vec<Bed_Entry>
         let mut result = HashMap::new();
-        for (_i, line) in reader.lines().enumerate() {
+        for line in reader.lines() {
             let l = line.unwrap();
-            let p: Vec<&str> = l.split("\t").collect();
-            let ko3: HashSet<String> = p[4].split(del).map(|s| s.to_string()).collect();
+            //let p: Vec<&str> = l.split("\t").collect();
+            let mut p2: Vec<&str> = l.split("\t").collect();
+            //let ko3: HashSet<String> = p2.nth(4).unwrap().split(del).map(|s| s.to_string()).collect();
+            let mut p3: BTreeMap<String, String>= BTreeMap::new();
+            if p2.len() > 3{
 
-            let bb = BedEntry { start: p[1].parse().unwrap(), end: p[2].parse().unwrap(), kind: p[3].to_string(), gene: ko3 };
-            result.entry(p[0].to_string()).or_insert(Vec::new()).push(bb);
+                let mut p4: Vec<Vec<&str>>= p2[2].split(";").map(|x | x.split("=").collect()).collect();
+                p3 = p2[2].split(";").map(|x | {
+                    let o: Vec<&str> = x.split("=").collect();
+                    let p = (o[0].to_string(), o[1].to_string());
+                    return p
+                }).into_iter().collect();
+            }
+
+            result.entry(p2[0].to_string()).or_insert(Vec::new()).push(BedEntry{start: p2[1].parse().unwrap(), end: p2[2].parse().unwrap(), tag: p3})
+
+            //let ko3: HashSet<String> = p[4].split(del).map(|s| s.to_string()).collect();
+
+            //result.entry(p2.nth(0).unwrap().to_string()).or_insert(Vec::new()).push(BedEntry { start: p2.nth(1).unwrap().parse().unwrap(), end: p2.nth(2).unwrap().parse().unwrap(), kind: p2.nth(3).unwrap().to_string(), gene: HashSet::new() });
         }
-        let mut count = 0;
-        for (_k,v) in result.iter(){
-            count += v.len();
-        }
+        // let mut count = 0;
+        // for (_k,v) in result.iter(){
+        //     count += v.len();
+        // }
 
         Self{
-            size: count,
+            size: 1,
             jojo: result,
 
         }
@@ -82,4 +70,19 @@ impl BedFile {
 
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::bed;
+    use std::time::{Duration, Instant};
+
+    #[test]
+    fn it_works() {
+        let start = Instant::now();
+
+        let g = bed::BedFile::read_gff("9888.gff");
+        let duration = start.elapsed();
+        println!("Time elapsed in expensive_function() is: {:?}", duration);
+
+    }
+}
 
