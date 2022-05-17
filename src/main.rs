@@ -7,7 +7,7 @@ use std::process;
 use clap::{App, AppSettings, Arg};
 use gfaR_wrapper::NGfa;
 use log::{error, info};
-use crate::bed::{BedFile};
+use crate::bed::{BedFile, out1, out_index};
 
 pub mod bed;
 
@@ -33,6 +33,10 @@ fn main() {
             .required(true)
             .takes_value(true)
             .about("Output file"))
+        .arg(Arg::new("length")
+            .short('l')
+            .long("length")
+            .about("Report length in the table"))
         .get_matches();
 
 
@@ -67,7 +71,7 @@ fn main() {
 
     // For each genome
     let u = bed_intersection(& graph, &bedfile, &gfa2pos_btree);
-    //writer(&u, matches.value_of("output").unwrap());
+    writer_v2(u.1, u.0, matches.value_of("out").unwrap());
 
 }
 
@@ -80,13 +84,14 @@ fn main() {
 /// # Output
 /// - 'node2data'
 ///     - {u32 -> {u32 -> u32
-pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> HashMap<&'a u32, Vec<BTreeMap<String, String>>>{
-    let mut k: HashMap<&'a u32, Vec<BTreeMap<String, String>>> = HashMap::new();
-    for x in graph.nodes.iter(){
-        k.insert(x.0, Vec::new());
-    }
+pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> (out1, out_index){
+    let index = out_index::new(bed);
+    let mut kk: out1 = out1::new(&index, &graph.nodes);
+    //let mut k: HashMap<&'a u32, Vec<BTreeMap<String, String>>> = HashMap::new();
 
-    for x in bed.jojo.iter() {
+
+
+    for x in bed.data.iter() {
         //
         if path2pos.contains_key(x.0){
             for y in x.1{
@@ -94,15 +99,33 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
 
 
                 for ö in op{
-                    k.get_mut(ö.1).unwrap().push(y.tag.clone());
-                    k.get_mut(ö.1).unwrap().push(y.tag.clone());
+                    for jo in x.1.iter(){
+                        for (k,v) in jo.tag.iter(){
+                            kk.hs.get_mut(ö.1).unwrap()[index.tags[k]].insert_if_absent(v.clone());
+                        }
+                    }
+
                 }
             }
         }
     }
-    return k
+    return (kk, index)
 }
 
+
+pub fn writer_v2(index: out_index, out11: out1, output: &str){
+    let f = File::create(output).expect("Unable to create file");
+    let mut f = BufWriter::new(f);
+    for x in out11.hs.iter(){
+        let k: Vec<String> = x.1.iter().map(|x|{
+            let f = x.iter().cloned().collect::<Vec<String>>().join(",");
+            return f
+        }).into_iter().collect();
+        let k2 = k.join("\t");
+
+        write!(f, "{}\t{}\n", x.0, k2, );
+    }
+}
 
 // /// Write a output file
 // ///

@@ -2,25 +2,32 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::time::Instant;
+use gfaR_wrapper::NNode;
+use linked_hash_set::LinkedHashSet;
 use log::info;
 
 pub struct BedFile {
     pub size: usize,
-    pub jojo: HashMap<String, Vec<BedEntry>>
+    pub data: HashMap<String, Vec<BedEntry>>
 }
 
+/// Bed entry
+/// chrom (or scaffold) name are stored in the BedFile
 pub struct BedEntry {
     pub start: u32,
     pub end: u32,
     pub tag: BTreeMap<String, String>,
 }
 
+
+
+
 impl BedFile {
 
     pub fn new() -> Self{
         Self{
             size: 0,
-            jojo: HashMap::new(),
+            data: HashMap::new(),
         }
     }
 
@@ -61,14 +68,85 @@ impl BedFile {
         //     count += v.len();
         // }
 
+
+
         Self{
-            size: 1,
-            jojo: result,
+            size: get_size(&result),
+            data: result,
 
         }
     }
 
 }
+
+
+pub struct out1{
+    pub hs: HashMap<u32, Vec<LinkedHashSet<String>>>,
+}
+
+
+impl out1 {
+    pub fn new(index: &out_index,nnodes:  &HashMap<u32, NNode>) -> Self {
+
+        let mut g2: HashMap<u32, Vec<LinkedHashSet<String>>>  = nnodes.iter().map(|x| {
+            let g3: Vec<LinkedHashSet<String>> = index.tags.iter().map(|x| LinkedHashSet::new()).collect();
+            let gg = (x.0.clone(), g3);
+            return gg
+        }).collect();
+        Self{
+            hs: g2,
+        }
+    }
+}
+
+pub struct out_index{
+    pub tags: HashMap<String, usize>,
+}
+
+impl out_index {
+    pub fn new(bedfile: &BedFile) -> Self{
+        let mut index = HashSet::new();
+
+        for (name, data) in bedfile.data.iter(){
+            for entry in data{
+                for (key, value) in entry.tag.iter(){
+                    index.insert(key);
+                }
+            }
+        }
+
+        let mut h: Vec<String> = index.into_iter().cloned().collect();
+        h.sort();
+        println!("{:?}", h);
+        let g: HashMap<String, usize> = h.iter().enumerate().map(|(key, value)| {
+            return (value.clone(), key.clone());
+        }).collect();
+
+        Self{
+            tags: g
+
+        }
+    }
+}
+
+impl out1 {
+
+}
+
+
+pub fn get_size(data: &HashMap<String, Vec<BedEntry>>) -> usize{
+    let mut count = 0;
+    for (_name, entry) in data.iter(){
+        count += entry.len();
+    }
+    return count;
+}
+
+
+
+
+
+
 
 #[cfg(test)]
 mod tests {
