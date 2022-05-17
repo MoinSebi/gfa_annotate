@@ -23,8 +23,6 @@ Overlay gene annotation from a gff format to the genome graph. Input format will
 | TAIR10 | 100 | 200 | ID=1;T=gene;G=AT3G43160;C=Biosynthesis |
 |--------|-----|-----|----------------------------------------|
 
-####Comment: 
-Since it might be possible that the original GFF file has multiple **genes** in one interval, please separate this in the bed file ;)
 
 ## Output 
 
