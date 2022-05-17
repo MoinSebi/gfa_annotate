@@ -101,7 +101,9 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
                 for ö in op{
                     for jo in x.1.iter(){
                         for (k,v) in jo.tag.iter(){
-                            kk.hs.get_mut(ö.1).unwrap()[index.tags[k]].insert_if_absent(v.clone());
+                            for x in v.iter(){
+                                kk.hs.get_mut(ö.1).unwrap()[index.tags[k]].insert_if_absent(x.clone());
+                            }
                         }
                     }
 
