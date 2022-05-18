@@ -5,11 +5,15 @@ use gfaR_wrapper::NNode;
 use linked_hash_set::LinkedHashSet;
 use log::{info};
 
+
+#[derive(Debug)]
 pub struct BedFile {
     pub size: usize,
     pub data: HashMap<String, Vec<BedEntry>>
 }
 
+
+#[derive(Debug)]
 /// Bed entry
 /// chrom (or scaffold) name are stored in the BedFile
 pub struct BedEntry {
@@ -46,6 +50,7 @@ impl BedFile {
             let line_data = line.unwrap();
             //let p: Vec<&str> = l.split("\t").collect();
             let col: Vec<&str> = line_data.split("\t").collect();
+            println!("{:?}", col);
             //let ko3: HashSet<String> = p2.nth(4).unwrap().split(del).map(|s| s.to_string()).collect();
             // If you are not empty
             if col.len() > 3{
@@ -69,6 +74,8 @@ impl BedFile {
         // for (_k,v) in result.iter(){
         //     count += v.len();
         // }
+
+        println!("{:?}", result);
 
 
 
@@ -123,13 +130,14 @@ impl TagIndex {
         }
 
         // Sort the index
+        println!("{:?}", index);
         let mut sorted: Vec<String> = index.into_iter().cloned().collect();
         sorted.sort();
         println!("{:?}", sorted);
         let tag2pos: HashMap<String, usize> = sorted.iter().enumerate().map(|(key, value)| {
             return (value.clone(), key.clone());
         }).collect();
-
+        println!("{:?}", tag2pos);
         Self{
             tags: tag2pos
         }
@@ -150,21 +158,4 @@ pub fn get_size(data: &HashMap<String, Vec<BedEntry>>) -> usize{
 
 
 
-
-
-#[cfg(test)]
-mod tests {
-    use crate::bed;
-    use std::time::{Duration, Instant};
-
-    #[test]
-    fn it_works() {
-        let start = Instant::now();
-
-        let g = bed::BedFile::read_gff("9888.gff");
-        let duration = start.elapsed();
-        println!("Time elapsed in expensive_function() is: {:?}", duration);
-
-    }
-}
 

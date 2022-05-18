@@ -6,7 +6,7 @@ use std::path::Path;
 use std::process;
 use clap::{App, AppSettings, Arg};
 use gfaR_wrapper::{NGfa, NNode};
-use log::{error, info};
+use log::{debug, error, info};
 use crate::bed::{BedFile, Node2Feature, TagIndex};
 
 pub mod bed;
@@ -70,7 +70,7 @@ fn main() {
 
     // For each genome
     let u = bed_intersection(& graph, &bedfile, &gfa2pos_btree);
-    writer_v2(u.1, u.0, &graph.nodes, matches.value_of("out").unwrap(), len);
+    writer_v2(u.1, u.0, &graph.nodes, matches.value_of("output").unwrap(), len);
 
 }
 
@@ -100,6 +100,8 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
         if path2pos.contains_key(x.0){
             for y in x.1{
                 let op = path2pos.get(x.0).unwrap().range(y.start..y.end);
+                println!("{:?}\t{:?}", y.start, y.end);
+                println!("{:?}", op);
 
 
                 for ö in op{
@@ -131,13 +133,20 @@ pub fn writer_v2(index: TagIndex, data: Node2Feature, nodes: &HashMap<u32, NNode
     let file = File::create(output).expect("Unable to create file");
     let mut file = BufWriter::new(file);
 
+    let mut tags_name: Vec<String> = Vec::new();
+    for i in 0..index.tags.len(){
+        for x in index.tags.iter(){
+            if x.1 == &i{
+                tags_name.push(x.0.clone());
+            }
+        }
+    }
+    let name: String = tags_name.join("\t");
     // Index
     if len{
-        let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
-        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name).expect("Can not write output");
+        write!(file, "{}\t{}\t{}\n", "node", "length", name).expect("Can not write output");
     } else {
-        let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
-        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name).expect("Can not write output");
+        write!(file, "{}\t{}\t{}\n", "node", "length", name).expect("Can not write output");
     }
 
 
@@ -185,5 +194,6 @@ pub fn node2pos(graph: &NGfa) -> HashMap<String, BTreeMap<u32, u32>>{
         // Add btree to corresponding path
         result.insert(path.name.clone(), btree);
     }
+    println!("{:?}", result);
     return result
 }
