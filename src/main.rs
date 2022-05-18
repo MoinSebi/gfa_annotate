@@ -1,5 +1,5 @@
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
 use std::io::{Write, BufWriter};
 use std::path::Path;
@@ -7,7 +7,7 @@ use std::process;
 use clap::{App, AppSettings, Arg};
 use gfaR_wrapper::{NGfa, NNode};
 use log::{error, info};
-use crate::bed::{BedFile, node2feature, out_index};
+use crate::bed::{BedFile, Node2Feature, TagIndex};
 
 pub mod bed;
 
@@ -29,7 +29,6 @@ fn main() {
             .required(true))
         .arg(Arg::new("output")
             .short('o')
-            .long("output")
             .required(true)
             .takes_value(true)
             .about("Output file"))
@@ -50,14 +49,14 @@ fn main() {
         process::exit(0x0100);
 
     }
-    let mut bedfile = BedFile::new();
+    let bedfile;
     if !Path::new(bed).exists(){
         error!("No bed file");
 
         process::exit(0x0100);
     } else {// Bed file
         info!("Read the gff/bed file");
-        bedfile = BedFile::read_bed(bed, ',');
+        bedfile = BedFile::read_bed(bed);
     }
 
 
@@ -89,9 +88,9 @@ pub fn node2length(nodes: &HashMap<u32, NNode>) -> HashMap<u32, usize>{
 /// # Output
 /// - 'node2data'
 ///     - {u32 -> {u32 -> u32
-pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> (node2feature, out_index){
-    let index = out_index::new(bed);
-    let mut kk: node2feature = node2feature::fromNodes(&index, &graph.nodes);
+pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> (Node2Feature, TagIndex){
+    let index = TagIndex::new(bed);
+    let mut kk: Node2Feature = Node2Feature::from_nodes(&index, &graph.nodes);
     //let mut k: HashMap<&'a u32, Vec<BTreeMap<String, String>>> = HashMap::new();
 
 
@@ -100,7 +99,7 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
         //
         if path2pos.contains_key(x.0){
             for y in x.1{
-                let mut op = path2pos.get(x.0).unwrap().range(y.start..y.end);
+                let op = path2pos.get(x.0).unwrap().range(y.start..y.end);
 
 
                 for ö in op{
@@ -128,17 +127,17 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
 /// **Arguments**
 /// * index: Index structure for column name
 /// * data: Containing node_id + tags
-pub fn writer_v2(index: out_index, data: node2feature, nodes: &HashMap<u32, NNode>, output: &str, len: bool){
+pub fn writer_v2(index: TagIndex, data: Node2Feature, nodes: &HashMap<u32, NNode>, output: &str, len: bool){
     let file = File::create(output).expect("Unable to create file");
     let mut file = BufWriter::new(file);
 
     // Index
     if len{
         let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
-        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name);
+        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name).expect("Can not write output");
     } else {
         let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
-        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name);
+        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name).expect("Can not write output");
     }
 
 
@@ -150,11 +149,11 @@ pub fn writer_v2(index: out_index, data: node2feature, nodes: &HashMap<u32, NNod
         let tags = tags_vector.join("\t");
 
         if len{
-            write!(file, "{}\t{}\t{}\n", key, nodes[key].len, tags);
+            write!(file, "{}\t{}\t{}\n", key, nodes[key].len, tags).expect("Can not write output");
 
         }
        else{
-           write!(file, "{}\t{}\n", key, tags);
+           write!(file, "{}\t{}\n", key, tags).expect("Can not write output");
        }
 
     }

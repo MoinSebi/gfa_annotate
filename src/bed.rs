@@ -1,10 +1,9 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::time::Instant;
 use gfaR_wrapper::NNode;
 use linked_hash_set::LinkedHashSet;
-use log::{debug, info};
+use log::{info};
 
 pub struct BedFile {
     pub size: usize,
@@ -36,7 +35,7 @@ impl BedFile {
     ///
     /// **Comment**
     /// Description of the BED file format is written in README
-    pub fn read_bed(filename: &str, del: char) -> Self{
+    pub fn read_bed(filename: &str) -> Self{
         info!("Reading BED file");
         let file = File::open(filename).expect("ERROR: CAN NOT READ FILE\n");
         let reader = BufReader::new(file);
@@ -46,13 +45,12 @@ impl BedFile {
         for line in reader.lines() {
             let line_data = line.unwrap();
             //let p: Vec<&str> = l.split("\t").collect();
-            let mut col: Vec<&str> = line_data.split("\t").collect();
+            let col: Vec<&str> = line_data.split("\t").collect();
             //let ko3: HashSet<String> = p2.nth(4).unwrap().split(del).map(|s| s.to_string()).collect();
-            let mut tag_data: BTreeMap<String, Vec<String>>= BTreeMap::new();
             // If you are not empty
             if col.len() > 3{
 
-                tag_data = col[3].split(";").map(|x | {
+                let tag_data: BTreeMap<String, Vec<String>> =  col[3].split(";").map(|x | {
                     let split_tags: Vec<&str> = x.split("=").collect();
                     let split_entries: Vec<String> = split_tags[1].split(",").map(|x| x.to_string()).collect();
 
@@ -87,16 +85,17 @@ impl BedFile {
 ///
 /// **Comment**
 /// This is the resulting data
-pub struct node2feature {
+pub struct Node2Feature {
     pub hs: HashMap<u32, Vec<LinkedHashSet<String>>>,
 }
 
 
-impl node2feature {
-    pub fn fromNodes(index: &out_index, nnodes:  &HashMap<u32, NNode>) -> Self {
+impl Node2Feature {
 
-        let mut g2: HashMap<u32, Vec<LinkedHashSet<String>>>  = nnodes.iter().map(|x| {
-            let g3: Vec<LinkedHashSet<String>> = index.tags.iter().map(|x| LinkedHashSet::new()).collect();
+    pub fn from_nodes(index: &TagIndex, nnodes:  &HashMap<u32, NNode>) -> Self {
+
+        let g2: HashMap<u32, Vec<LinkedHashSet<String>>>  = nnodes.iter().map(|x| {
+            let g3: Vec<LinkedHashSet<String>>  = vec![LinkedHashSet::new(); index.tags.len()];
             let gg = (x.0.clone(), g3);
             return gg
         }).collect();
@@ -106,18 +105,18 @@ impl node2feature {
     }
 }
 
-pub struct out_index{
+pub struct TagIndex {
     pub tags: HashMap<String, usize>,
 }
 
-impl out_index {
+impl TagIndex {
     pub fn new(bedfile: &BedFile) -> Self{
         let mut index = HashSet::new();
 
         // Make index
-        for (name, data) in bedfile.data.iter(){
+        for (_name, data) in bedfile.data.iter(){
             for entry in data{
-                for (key, value) in entry.tag.iter(){
+                for (key, _value) in entry.tag.iter(){
                     index.insert(key);
                 }
             }
