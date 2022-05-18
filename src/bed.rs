@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader};
 use std::time::Instant;
 use gfaR_wrapper::NNode;
 use linked_hash_set::LinkedHashSet;
-use log::info;
+use log::{debug, info};
 
 pub struct BedFile {
     pub size: usize,
@@ -16,7 +16,7 @@ pub struct BedFile {
 pub struct BedEntry {
     pub start: u32,
     pub end: u32,
-    pub tag: BTreeMap<String, String>,
+    pub tag: BTreeMap<String, Vec<String>>, // Tag->Entries
 }
 
 
@@ -33,31 +33,35 @@ impl BedFile {
 
 
     /// Reading a bed file
-    /// Format description in the README
+    ///
+    /// **Comment**
+    /// Description of the BED file format is written in README
     pub fn read_bed(filename: &str, del: char) -> Self{
-        info!("Reading bed file");
+        info!("Reading BED file");
         let file = File::open(filename).expect("ERROR: CAN NOT READ FILE\n");
         let reader = BufReader::new(file);
 
         // Fasta_entry -> Vec<Bed_Entry>
         let mut result = HashMap::new();
         for line in reader.lines() {
-            let l = line.unwrap();
+            let line_data = line.unwrap();
             //let p: Vec<&str> = l.split("\t").collect();
-            let mut p2: Vec<&str> = l.split("\t").collect();
+            let mut col: Vec<&str> = line_data.split("\t").collect();
             //let ko3: HashSet<String> = p2.nth(4).unwrap().split(del).map(|s| s.to_string()).collect();
-            let mut p3: BTreeMap<String, String>= BTreeMap::new();
-            if p2.len() > 3{
+            let mut tag_data: BTreeMap<String, Vec<String>>= BTreeMap::new();
+            // If you are not empty
+            if col.len() > 3{
 
-                let mut p4: Vec<Vec<&str>>= p2[2].split(";").map(|x | x.split("=").collect()).collect();
-                p3 = p2[2].split(";").map(|x | {
-                    let o: Vec<&str> = x.split("=").collect();
-                    let p = (o[0].to_string(), o[1].to_string());
-                    return p
+                tag_data = col[3].split(";").map(|x | {
+                    let split_tags: Vec<&str> = x.split("=").collect();
+                    let split_entries: Vec<String> = split_tags[1].split(",").map(|x| x.to_string()).collect();
+
+                    return (split_tags[0].to_string(), split_entries);
                 }).into_iter().collect();
+                result.entry(col[0].to_string()).or_insert(Vec::new()).push(BedEntry{start: col[1].parse().unwrap(), end: col[2].parse().unwrap(), tag: tag_data })
+
             }
 
-            result.entry(p2[0].to_string()).or_insert(Vec::new()).push(BedEntry{start: p2[1].parse().unwrap(), end: p2[2].parse().unwrap(), tag: p3})
 
             //let ko3: HashSet<String> = p[4].split(del).map(|s| s.to_string()).collect();
 
@@ -79,14 +83,17 @@ impl BedFile {
 
 }
 
-
-pub struct out1{
+/// Node to feature
+///
+/// **Comment**
+/// This is the resulting data
+pub struct node2feature {
     pub hs: HashMap<u32, Vec<LinkedHashSet<String>>>,
 }
 
 
-impl out1 {
-    pub fn new(index: &out_index,nnodes:  &HashMap<u32, NNode>) -> Self {
+impl node2feature {
+    pub fn fromNodes(index: &out_index, nnodes:  &HashMap<u32, NNode>) -> Self {
 
         let mut g2: HashMap<u32, Vec<LinkedHashSet<String>>>  = nnodes.iter().map(|x| {
             let g3: Vec<LinkedHashSet<String>> = index.tags.iter().map(|x| LinkedHashSet::new()).collect();
@@ -107,6 +114,7 @@ impl out_index {
     pub fn new(bedfile: &BedFile) -> Self{
         let mut index = HashSet::new();
 
+        // Make index
         for (name, data) in bedfile.data.iter(){
             for entry in data{
                 for (key, value) in entry.tag.iter(){
@@ -115,25 +123,22 @@ impl out_index {
             }
         }
 
-        let mut h: Vec<String> = index.into_iter().cloned().collect();
-        h.sort();
-        println!("{:?}", h);
-        let g: HashMap<String, usize> = h.iter().enumerate().map(|(key, value)| {
+        // Sort the index
+        let mut sorted: Vec<String> = index.into_iter().cloned().collect();
+        sorted.sort();
+        println!("{:?}", sorted);
+        let tag2pos: HashMap<String, usize> = sorted.iter().enumerate().map(|(key, value)| {
             return (value.clone(), key.clone());
         }).collect();
 
         Self{
-            tags: g
-
+            tags: tag2pos
         }
     }
 }
 
-impl out1 {
 
-}
-
-
+/// Get the total size of the HashMap
 pub fn get_size(data: &HashMap<String, Vec<BedEntry>>) -> usize{
     let mut count = 0;
     for (_name, entry) in data.iter(){

@@ -5,9 +5,9 @@ use std::io::{Write, BufWriter};
 use std::path::Path;
 use std::process;
 use clap::{App, AppSettings, Arg};
-use gfaR_wrapper::NGfa;
+use gfaR_wrapper::{NGfa, NNode};
 use log::{error, info};
-use crate::bed::{BedFile, out1, out_index};
+use crate::bed::{BedFile, node2feature, out_index};
 
 pub mod bed;
 
@@ -42,6 +42,7 @@ fn main() {
 
     let gfa = matches.value_of("gfa").unwrap();
     let bed = matches.value_of("bed").unwrap();
+    let len = matches.is_present("length");
 
 
     if !Path::new(gfa).exists(){
@@ -65,14 +66,18 @@ fn main() {
     let mut graph = NGfa::new();
     graph.from_graph(gfa);
     let gfa2pos_btree = node2pos(&graph);
-
     // Bed file
     info!("Read the gff/bed file");
 
     // For each genome
     let u = bed_intersection(& graph, &bedfile, &gfa2pos_btree);
-    writer_v2(u.1, u.0, matches.value_of("out").unwrap());
+    writer_v2(u.1, u.0, &graph.nodes, matches.value_of("out").unwrap(), len);
 
+}
+
+pub fn node2length(nodes: &HashMap<u32, NNode>) -> HashMap<u32, usize>{
+    let node_length: HashMap<u32, usize> = nodes.iter().map(|x| (x.0.clone(), x.1.len)).collect();
+    return node_length
 }
 
 /// Intersecting the bed file and with positions in the graph
@@ -84,9 +89,9 @@ fn main() {
 /// # Output
 /// - 'node2data'
 ///     - {u32 -> {u32 -> u32
-pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> (out1, out_index){
+pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashMap<String, BTreeMap<u32, u32>>) -> (node2feature, out_index){
     let index = out_index::new(bed);
-    let mut kk: out1 = out1::new(&index, &graph.nodes);
+    let mut kk: node2feature = node2feature::fromNodes(&index, &graph.nodes);
     //let mut k: HashMap<&'a u32, Vec<BTreeMap<String, String>>> = HashMap::new();
 
 
@@ -114,33 +119,47 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: & BedFile, path2pos: &'a HashM
     return (kk, index)
 }
 
+/// Writing output
+///
+/// **Comment**
+/// Tabular output format
+/// Node Tag1 Tag2 Tag3
+///
+/// **Arguments**
+/// * index: Index structure for column name
+/// * data: Containing node_id + tags
+pub fn writer_v2(index: out_index, data: node2feature, nodes: &HashMap<u32, NNode>, output: &str, len: bool){
+    let file = File::create(output).expect("Unable to create file");
+    let mut file = BufWriter::new(file);
 
-pub fn writer_v2(index: out_index, out11: out1, output: &str){
-    let f = File::create(output).expect("Unable to create file");
-    let mut f = BufWriter::new(f);
-    for x in out11.hs.iter(){
-        let k: Vec<String> = x.1.iter().map(|x|{
+    // Index
+    if len{
+        let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
+        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name);
+    } else {
+        let tags_name: String = index.tags.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(",");
+        write!(file, "{}\t{}\t{}\n", "node", "length", tags_name);
+    }
+
+
+    for (key, value) in data.hs.iter(){
+        let tags_vector: Vec<String> = value.iter().map(|x|{
             let f = x.iter().cloned().collect::<Vec<String>>().join(",");
             return f
         }).into_iter().collect();
-        let k2 = k.join("\t");
+        let tags = tags_vector.join("\t");
 
-        write!(f, "{}\t{}\n", x.0, k2, );
+        if len{
+            write!(file, "{}\t{}\t{}\n", key, nodes[key].len, tags);
+
+        }
+       else{
+           write!(file, "{}\t{}\n", key, tags);
+       }
+
     }
 }
 
-// /// Write a output file
-// ///
-// /// Nodes   KIND    GENE
-// pub fn writer<'a>(input: &HashMap<&'a u32, Vec<BTreeMap<String, String>>>, output: &str){
-//     let f = File::create(output).expect("Unable to create file");
-//     let mut f = BufWriter::new(f);
-//     for (k1,k2) in input.iter(){
-//         let o: Vec<String> = k2.0.iter().cloned().collect();
-//         let o2: Vec<String> = k2.1.iter().cloned().collect();
-//         write!(f, "{}\t{}\t{}\n", k1, o.join(","), o2.join(",")).expect("Can not write file");
-//     }
-// }
 
 
 
