@@ -24,7 +24,7 @@ def readgff(filename):
                 start = lsplit[3]
                 end = lsplit[4]
                 tagg = lsplit[8]
-                data.append([chr, start, end, "T=" + t, tagg])
+                data.append([chr, start-1, end, "T=" + t, tagg])
 
     return data
 
