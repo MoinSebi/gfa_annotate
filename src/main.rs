@@ -110,14 +110,24 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
                     let entry_len = entry.end - entry.start;
                     let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
                     let tag = entry.tag.clone() + ";F=" + &to_bigger.to_string();
-                    result.data.entry(*interval.first().unwrap().1).or_insert(vec![tag.clone()]).push(tag);
+                    result.data.entry(*bigger.1).or_insert(vec![tag.clone()]).push(tag);
 
 
                 } else {
+                    let entry_len = entry.end - (interval.last().unwrap().0 + 1);
+                    if entry_len != 0{
+
+                        let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
+                        let tag = entry.tag.clone() + ";F=" + &to_bigger.to_string();
+                        result.data.entry(*bigger.1).or_insert(vec![tag.clone()]).push(tag);
+
+                    }
                     let from_smallest = (interval.first().unwrap().0) - entry.start;
                     let to_smallest = from_smallest as f64/ graph.nodes.get(interval.first().unwrap().1).unwrap().len as f64;
                     let tag = entry.tag.clone() + ";F=" + &to_smallest.to_string();
                     result.data.entry(*interval.first().unwrap().1).or_insert(vec![tag.clone()]).push(tag);
+
+
 
 
                 }
@@ -180,8 +190,10 @@ pub fn node2pos(graph: &NGfa) -> HashMap<String, BTreeMap<u32, u32>>{
             position += graph.nodes.get(node).unwrap().len as u32
         }
         // Add btree to corresponding path
+        btree.insert(position+1, 0);
         result.insert(path.name.clone(), btree);
     }
+
     println!("{:?}", result);
     return result
 }
