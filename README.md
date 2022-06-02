@@ -37,4 +37,5 @@ Overlay gene annotation from a gff format to the genome graph. Input format will
 - [ ] Add a column for the fraction covered   
 - [ ] Add guide on how to get GO terms
 - [ ] Tests 
-- [ ] Script: Include 1- to 0- based switch 
+- [x] Script: Include 1- to 0- based switch 
+- [ ] Add dummy start and end with not function (0 and max+1)
