@@ -1,5 +1,6 @@
 
 use std::collections::{BTreeMap, HashMap};
+use std::fmt::format;
 use std::fs::File;
 use std::io::{Write, BufWriter};
 use std::path::Path;
@@ -104,9 +105,15 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
         if path2pos.contains_key(name){
             let index = path2pos.get(name).unwrap();
             for entry in data{
-                let interval: Vec<_> = index.range(entry.start..entry.end).collect();
+                let interval: Vec<_> = index.range(entry.start+1..entry.end).collect();
+
+                // This is the node coming after the end of the entry - this might also be covered
                 let bigger = index.range(entry.end..).next().unwrap();
+
+
+                // This is the specific case of you are within a node
                 if interval.len() == 0{
+                    println!("Im single");
                     let entry_len = entry.end - entry.start;
                     let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
                     let tag = entry.tag.clone() + ";F=" + &to_bigger.to_string();
@@ -114,17 +121,17 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
 
 
                 } else {
-                    let entry_len = entry.end - (interval.last().unwrap().0 + 1);
+                    let entry_len = (entry.end) - (interval.last().unwrap().0);
                     if entry_len != 0{
 
                         let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
-                        let tag = entry.tag.clone() + ";F=" + &to_bigger.to_string();
+                        let tag = entry.tag.clone() + ";F=" + &format!("{:.1$}", to_bigger, 2);
                         result.data.entry(*bigger.1).or_insert(vec![tag.clone()]).push(tag);
 
                     }
                     let from_smallest = (interval.first().unwrap().0) - entry.start;
                     let to_smallest = from_smallest as f64/ graph.nodes.get(interval.first().unwrap().1).unwrap().len as f64;
-                    let tag = entry.tag.clone() + ";F=" + &to_smallest.to_string();
+                    let tag = entry.tag.clone() + ";F=" + &format!("{:.1$}", to_smallest, 2);
                     result.data.entry(*interval.first().unwrap().1).or_insert(vec![tag.clone()]).push(tag);
 
 
