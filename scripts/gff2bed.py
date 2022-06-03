@@ -15,16 +15,20 @@ def readgff(filename):
     with open(filename) as file:
         for line in file.readlines():
             lsplit = line.split()
+
             if len(lsplit) > 7:
-                tags = dict([(x.split("=")[0], x.split("=")[1].split(",")) for x in lsplit[8].split(";")])
-
-
                 chr = lsplit[0]
                 t = lsplit[2]
-                start = lsplit[3]
-                end = lsplit[4]
+                start = int(lsplit[3])
+                end = int(lsplit[4])
                 tagg = lsplit[8]
                 data.append([chr, start-1, end, "T=" + t, tagg])
+            elif len(lsplit) > 0:
+                chr = lsplit[0]
+                t = lsplit[2]
+                start = int(lsplit[3])
+                end = int(lsplit[4])
+                data.append([chr, start-1, end, "T=" + t])
 
     return data
 
@@ -35,7 +39,7 @@ def readgff(filename):
 def write_bed(data, filename):
     with open(filename, "w") as file:
         for x in data:
-            file.write("\t".join(x[:3]) + "\t" + x[3] + ";" + x[4] + "\n")
+            file.write("\t".join([str(y) for y in x[:3]]) + "\t" + x[3] + ";" + x[4] + "\n")
 
 
 if __name__ == "__main__":
