@@ -11,13 +11,6 @@ Overlay gene annotation from a gff format to the genome graph. Input format will
 | 4   | String | Tags        |  
 
 
-####Tags (examples, semi-colon separated)
-- ID=Custom_identifier (1,2,3)
-- T=Type (Gene, mRNA)
-- G=Gene_name
-- OG=Orthogroup
-- More tags can be added with "=" (key, value pair)
-
 **Example** (tab-separated):  
 
 | TAIR10 | 100 | 200 | ID=1;T=gene;G=AT3G43160;C=Biosynthesis |
@@ -37,5 +30,7 @@ Overlay gene annotation from a gff format to the genome graph. Input format will
 - [x] Add a column for the fraction covered   
 - [x] Script: Include 1- to 0- based switch
 - [x] Add dummy start and end with not function (0 and max+1)
-- [ ] More tests
+- [ ] More tests, not working
 - [ ] README stuff, easy explain
+- [ ] Check how much fraction in real data set 
+- [ ] Think about multiple entries having the same gene
