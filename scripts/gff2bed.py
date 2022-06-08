@@ -10,7 +10,12 @@ import argparse
 import logging
 
 
-def readgff(filename):
+def read_gff(filename):
+    """
+    Reading the GFF file - already changing the
+    :param filename: GFF file name
+    :return: data --> [[chr, start, end, tags(with feature type]]
+    """
     data = []
     with open(filename) as file:
         for line in file.readlines():
@@ -37,6 +42,12 @@ def readgff(filename):
 
 
 def write_bed(data, filename):
+    """
+    Writing the bed file
+    :param data: the gff file
+    :param filename: the output filenam
+    :return:
+    """
     with open(filename, "w") as file:
         for x in data:
             file.write("\t".join([str(y) for y in x[:3]]) + "\t" + x[3] + ";" + x[4] + "\n")
@@ -56,7 +67,7 @@ if __name__ == "__main__":
 
 
     logger.info("Read GFF")
-    gff = readgff(args.gff)
+    gff = read_gff(args.gff)
 
     logger.info("Write output BED")
     write_bed(gff, args.output)
