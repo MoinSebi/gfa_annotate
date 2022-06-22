@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--gff", help="Gff file")
-    parser.add_argument("-o", "--output", help="Output file")
+    parser.add_argument("-g", "--gff", help="Gff file", required=True)
+    parser.add_argument("-o", "--output", help="Output file", required=True)
     args = parser.parse_args()
 
 
