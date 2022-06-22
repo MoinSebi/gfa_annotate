@@ -41,9 +41,8 @@ impl BedFile {
 
 
     /// Reading a bed file
-    ///
-    /// **Comment**
-    /// Description of the BED file format is written in README
+    /// Format description: https://en.wikipedia.org/wiki/BED_(file_format)
+    /// Fast and dirty
     pub fn read_bed(filename: &str) -> Self{
         info!("Reading BED file");
         let file = File::open(filename).expect("ERROR: CAN NOT READ FILE\n");
@@ -60,8 +59,6 @@ impl BedFile {
             let tag = col[3..].join(";");
             result.entry(col[0].to_string()).or_insert(Vec::new()).push(BedEntry { start: col[1].parse().unwrap(), end: col[2].parse().unwrap(), tag: tag })
         }
-
-        println!("{:?}", result);
 
 
 
@@ -91,6 +88,7 @@ pub struct Node2Feature{
 
 impl Node2Feature{
 
+    /// From graph for empty data structure
     pub fn new(graph: &NGfa) -> Self{
         let mut k: HashMap<u32, Vec<String>> = HashMap::new();
         for (id, node) in graph.nodes.iter(){

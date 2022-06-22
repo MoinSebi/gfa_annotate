@@ -1,1 +1,4 @@
-a_Chr1	4	13	AT=AT1;T=gene
+a_Chr1	10	12	AT=AT1
+a_Chr1	0	20	AT=AT2
+a_Chr1	10	45	AT=AT3
+b_Chr1	10	30	AT=AT4

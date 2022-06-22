@@ -18,7 +18,7 @@ fn main() {
     let matches = App::new("gfa_annotate")
         .version("0.1.0")
         .author("Sebastian V")
-        .about("Overlap annotation and genome graph")
+        .about("Overlap annotation and genome graphs")
         .setting(AppSettings::ArgRequiredElseHelp)
         .arg(Arg::new("gfa")
             .short('g')
@@ -77,7 +77,6 @@ fn main() {
 
     // For each genome
     let u = bed_intersection(& graph, bedfile, &gfa2pos_btree);
-    println!("dsakdjaskjd");
     writer_v2(u,  &graph.nodes, matches.value_of("output").unwrap(), len);
 
 }
@@ -113,7 +112,6 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
 
                 // This is the specific case of you are within a node
                 if interval.len() == 0{
-                    println!("Im single");
                     let entry_len = entry.end - entry.start;
                     let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
                     let tag = entry.tag.clone() + ";F=" + &to_bigger.to_string();
@@ -201,6 +199,5 @@ pub fn node2pos(graph: &NGfa) -> HashMap<String, BTreeMap<u32, u32>>{
         result.insert(path.name.clone(), btree);
     }
 
-    println!("{:?}", result);
     return result
 }
