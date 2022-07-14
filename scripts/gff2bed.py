@@ -1,9 +1,5 @@
-"""
-This is not part of the tool and was only added for my own project.
-SV
-
-
-"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 import argparse
