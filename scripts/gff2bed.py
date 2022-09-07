@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-def read_gff(filename):
+def read_gff(filename, a = None):
     """
     Reading the GFF file - already changing the
     :param filename: GFF file name
@@ -16,20 +16,21 @@ def read_gff(filename):
     with open(filename) as file:
         for line in file.readlines():
             lsplit = line.split()
+            if len(lsplit) != 0:
+                chr = lsplit[0]
+                start = int(lsplit[3])
+                end = int(lsplit[4])
+                if a != None:
+                    tagg = lsplit[8]
+                    tag = tagg.split(";")
+                    tt = [x.split(":")[0] for x in tag if x.startswith(a)]
+                    if len(tt) != 0:
+                        data.append([chr, start-1, end, tt[0]])
 
-            if len(lsplit) > 7:
-                chr = lsplit[0]
-                t = lsplit[2]
-                start = int(lsplit[3])
-                end = int(lsplit[4])
-                tagg = lsplit[8]
-                data.append([chr, start-1, end, "T=" + t, tagg])
-            elif len(lsplit) > 0:
-                chr = lsplit[0]
-                t = lsplit[2]
-                start = int(lsplit[3])
-                end = int(lsplit[4])
-                data.append([chr, start-1, end, "T=" + t])
+                else:
+                    t = lsplit[2]
+                    data.append([chr, start-1, end, t])
+
 
     return data
 
@@ -46,10 +47,12 @@ def write_bed(data, filename):
     """
     with open(filename, "w") as file:
         for x in data:
-            file.write("\t".join([str(y) for y in x[:3]]) + "\t" + x[3] + ";" + x[4] + "\n")
+            print(x)
+            file.write("\t".join([str(y) for y in x[:3]]) + "\t" + x[3] + "\n")
 
 
 if __name__ == "__main__":
+    # Logging
     logger = logging.getLogger('simple_example')
     logging.basicConfig(format='%(asctime)s %(message)s')
     logger.setLevel(logging.INFO)
@@ -58,12 +61,15 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gff", help="Gff file", required=True)
+    parser.add_argument("-t", "--type", help="Extract type [default: True]", action="store_true")
+    parser.add_argument("-a", "--attribute", help = "Extract this attribute (except of type)")
     parser.add_argument("-o", "--output", help="Output file", required=True)
     args = parser.parse_args()
 
 
     logger.info("Read GFF")
-    gff = read_gff(args.gff)
+    o = True
+    gff = read_gff(args.gff, args.attribute)
 
     logger.info("Write output BED")
     write_bed(gff, args.output)
