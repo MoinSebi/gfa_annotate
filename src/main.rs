@@ -1,14 +1,12 @@
 
 use std::collections::{BTreeMap, HashMap};
-use std::fmt::format;
 use std::fs::File;
 use std::io::{Write, BufWriter};
 use std::path::Path;
 use std::process;
-use std::ptr::write;
 use clap::{App, AppSettings, Arg};
 use gfaR_wrapper::{NGfa, NNode};
-use log::{debug, error, info};
+use log::{error, info};
 use crate::bed::{BedFile, Node2Feature};
 
 
@@ -127,13 +125,13 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
 
                         let to_bigger = entry_len as f64/ graph.nodes.get(bigger.1).unwrap().len as f64;
                         let tag = entry.tag.clone() + ";F=" + &format!("{:.1$}", to_bigger, 2);
-                        result.data.entry(*bigger.1).or_insert(vec![tag.clone()]).push(tag);
+                        result.data.entry(*bigger.1).or_insert(vec![]).push(tag);
 
                     }
                     let from_smallest = (interval.first().unwrap().0) - entry.start;
                     let to_smallest = from_smallest as f64/ graph.nodes.get(interval.first().unwrap().1).unwrap().len as f64;
                     let tag = entry.tag.clone() + ";F=" + &format!("{:.1$}", to_smallest, 2);
-                    result.data.entry(*interval.first().unwrap().1).or_insert(vec![tag.clone()]).push(tag);
+                    result.data.entry(*interval.first().unwrap().1).or_insert(vec![]).push(tag);
 
 
 
@@ -141,7 +139,7 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
                 }
                 for hit in interval.iter().skip(1){
                     let tt = entry.tag.clone() + ";F=1.00";
-                    result.data.entry(*hit.1).or_insert(vec![tt.clone()]).push(tt);
+                    result.data.entry(*hit.1).or_insert(vec![]).push(tt);
                 }
             }
         }

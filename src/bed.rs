@@ -1,8 +1,7 @@
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{HashMap};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use gfaR_wrapper::{NGfa, NNode};
-use linked_hash_set::LinkedHashSet;
+use gfaR_wrapper::{NGfa};
 use log::{info};
 
 
@@ -56,7 +55,10 @@ impl BedFile {
             let col: Vec<&str> = line_data.split("\t").collect();
             //let ko3: HashSet<String> = p2.nth(4).unwrap().split(del).map(|s| s.to_string()).collect();
             // If you are not empty
-            let tag = col[3..].join(";");
+            if col.len() != 4{
+                eprintln!("ERROR")
+            }
+            let tag = col[3].to_string();
             result.entry(col[0].to_string()).or_insert(Vec::new()).push(BedEntry { start: col[1].parse().unwrap(), end: col[2].parse().unwrap(), tag: tag })
         }
 
@@ -69,7 +71,12 @@ impl BedFile {
         }
     }
 
+
 }
+
+
+
+
 
 /// Get the total size of the HashMap
 pub fn get_size(data: &HashMap<String, Vec<BedEntry>>) -> usize{
@@ -91,7 +98,7 @@ impl Node2Feature{
     /// From graph for empty data structure
     pub fn new(graph: &NGfa) -> Self{
         let mut k: HashMap<u32, Vec<String>> = HashMap::new();
-        for (id, node) in graph.nodes.iter(){
+        for (id, _node) in graph.nodes.iter(){
             k.insert(id.clone(), vec![]);
         }
         Self{
