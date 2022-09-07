@@ -25,7 +25,14 @@ def read_gff(filename, a = None):
                     tag = tagg.split(";")
                     tt = [x.split(":")[0] for x in tag if x.startswith(a)]
                     if len(tt) != 0:
-                        data.append([chr, start-1, end, tt[0]])
+                        tt2 = tt[0].split("=")[1]
+                        t2 = tt2.split(",")
+                        if len(t2) > 1:
+                            for x in t2:
+                                data.append([chr, start-1, end, x])
+                        else:
+                            data.append([chr, start-1, end, t2[0]])
+
 
                 else:
                     t = lsplit[2]
