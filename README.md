@@ -1,5 +1,5 @@
 # gfa_annotate
-Translate gene annotation (intervals) from a bed format to the id space of a genome graph. The bed format is only allowed to have of four columns (see below).  
+Translate gene annotation (intervals) from a bed format to the node id space of a variation graph. The bed format is only allowed to have of four columns (see below).  
 
 If you want to convert gff to bed file, use the [gff2bed.py script](#abcd) 
 
