@@ -17,6 +17,9 @@ fn test_default() -> Result<(), Box<dyn std::error::Error>> {
         .arg("data/output/test.overlap.default.txt");
     cmd.assert().success();
     let path = "data/output/test.overlap.default.txt";
+    let foo: String = fs::read_to_string(path).unwrap();
+    assert_eq!(foo.contains("1\tAT2"), true);
+
     fs::remove_file(path).unwrap();
 
     Ok(())
@@ -37,6 +40,10 @@ fn test_fraction() -> Result<(), Box<dyn std::error::Error>> {
         .arg("-f");
     cmd.assert().success();
     let path = "data/output/test.overlap.fraction.txt";
+    let foo: String = fs::read_to_string(path).unwrap();
+    println!("{}", foo);
+
+    assert_eq!(foo.contains("AT4;0.40"), true);
     fs::remove_file(path).unwrap();
 
     Ok(())
@@ -56,7 +63,10 @@ fn test_length() -> Result<(), Box<dyn std::error::Error>> {
         .arg("data/output/test.overlap.length.txt")
         .arg("-l");
     cmd.assert().success();
+
     let path = "data/output/test.overlap.length.txt";
+    let foo: String = fs::read_to_string(path).unwrap();
+    assert_eq!(foo.contains("AT3\t10"), true);
     fs::remove_file(path).unwrap();
 
     Ok(())
@@ -79,6 +89,8 @@ fn test_fraction_length() -> Result<(), Box<dyn std::error::Error>> {
         .arg("-l");
     cmd.assert().success();
     let path = "data/output/test.overlap.fraction.length.txt";
+    let foo: String = fs::read_to_string(path).unwrap();
+    assert_eq!(foo.contains("1.00\t10"), true);
     fs::remove_file(path).unwrap();
 
     Ok(())

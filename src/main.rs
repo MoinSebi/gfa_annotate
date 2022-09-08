@@ -175,7 +175,7 @@ pub fn writer_v2(data: Node2Feature, nodes: &HashMap<u32, NNode>, output: &str, 
     let mut f = BufWriter::new(f);
     if len{
         for (node_id, feature) in data.data.iter(){
-            write!(f, "{}\t{}\t{}\n", node_id, nodes.get(node_id).unwrap().len, feature.into_iter().cloned().collect::<Vec<String>>().join(",")).expect("Can't write file");
+            write!(f, "{}\t{}\t{}\n", node_id, feature.into_iter().cloned().collect::<Vec<String>>().join(","), nodes.get(node_id).unwrap().len).expect("Can't write file");
 
         }
     } else {
