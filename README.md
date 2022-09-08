@@ -3,8 +3,39 @@ Overlay gene annotation from a bed format to the genome graph. The bed format ha
 
 If you want to convert gff to bed file, use the gff2bed.py script (s. below). 
 
+## Help message:
+```text
+gfa_annotate 0.1.0
 
-## **Example input BED format** (tab-separated):  
+Sebastian V
+
+Overlap annotation and genome graphs
+
+USAGE:
+    gfa_annotate -g <gfa> -b <bed> -o <output>
+
+FLAGS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+Input:
+    -b <bed>        bed file
+    -g <gfa>        input gfa
+
+Additional features:
+    -f, --fraction    Report fraction of how much is covered
+    -l, --length      Report length in the table
+
+Output:
+    -o <output>        Output file
+```
+
+
+## **Example input BED format**: 
+- Tab-separated
+- Only four columns 
+
+Example: 
 
 | TAIR10 | 100 | 200 | gene |
 |--------|-----|-----|------|
@@ -23,22 +54,49 @@ If you want to convert gff to bed file, use the gff2bed.py script (s. below).
 
 *If the fraction parameter is set, the fraction value in added after the entry. If the same entry has two different fractions, entry is represented twice with different fractions. Must be here because it is specific to the annotation and not the node.
 
+#### Example (header for understanding):
+Default 
+
+| Node id | Feature         |   
+|---------|-----------------|
+| 11      | AT1234          |   
+| 12      | AT14213, AT4321 |   
+
+With fraction and length:
+
+| node id | Feature;Fraction,[]   | Length |
+|---------|-----------------------|--------|
+| 11      | AT1234;1              | 21     |
+| 12      | AT14213;0.75,AT4321;1 | 4      |
+
 
 
 
 ## gff2bed.py information    
-
-**Requirements:** 
-- Python3
+**Requirements:**
+- python3
 - argparse
 - logging
 
+
+```text
+usage: gff2bed.py [-h] -g GFF [-a ATTRIBUTE] -o OUTPUT
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -g GFF, --gff GFF     Gff file
+  -a ATTRIBUTE, --attribute ATTRIBUTE 
+                        Extract this attribute (except of type)
+  -o OUTPUT, --output OUTPUT
+                        Output file
+
+```
+
+## Testing
+Check out ```./data/exmaple_data/```
+```text
+cargo test
+```
+
 ##TODO
-- [x] Add a column for the fraction covered   
-- [x] Script: Include 1- to 0- based switch
-- [ ] More tests, not working
-- [ ] README stuff, easy explain
-- [ ] Check how much fraction in real data set 
-- [x] Simplify pipeline to have only one column
-- [ ] Add python script to covert from gff to bed
-- [ ] Fraction and length
+???
