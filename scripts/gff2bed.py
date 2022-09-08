@@ -68,15 +68,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gff", help="Gff file", required=True)
-    parser.add_argument("-t", "--type", help="Extract type [default: True]", action="store_true")
     parser.add_argument("-a", "--attribute", help = "Extract this attribute (except of type)")
     parser.add_argument("-o", "--output", help="Output file", required=True)
     args = parser.parse_args()
 
 
     logger.info("Read GFF")
-    o = True
-    gff = read_gff(args.gff, args.attribute)
+    gff = read_gff(args.gff, True)
 
     logger.info("Write output BED")
     write_bed(gff, args.output)
