@@ -1,7 +1,7 @@
 # gfa_annotate
-Overlay gene annotation from a bed format to the genome graph. The bed format has a maximum of four columns 
+Translate gene annotation (intervals) from a bed format to the id space of a genome graph. The bed format is only allowed to have of four columns (see below).  
 
-If you want to convert gff to bed file, use the gff2bed.py script (s. below). 
+If you want to convert gff to bed file, use the [gff2bed.py script](#abcd) 
 
 ## Help message:
 ```text
@@ -72,7 +72,8 @@ With fraction and length:
 
 
 
-## gff2bed.py information    
+#<a id="abcd"></a>gff2bed.py information
+
 **Requirements:**
 - python3
 - argparse
