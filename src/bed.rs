@@ -1,4 +1,4 @@
-use std::collections::{HashMap};
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use gfaR_wrapper::{NGfa};
@@ -90,16 +90,16 @@ pub fn get_size(data: &HashMap<String, Vec<BedEntry>>) -> usize{
 
 /// Node to feature
 pub struct Node2Feature{
-    pub data: HashMap<u32, Vec<String>>
+    pub data: HashMap<u32, HashSet<String>>
 }
 
 impl Node2Feature{
 
     /// From graph for empty data structure
     pub fn new(graph: &NGfa) -> Self{
-        let mut k: HashMap<u32, Vec<String>> = HashMap::new();
+        let mut k: HashMap<u32, HashSet<String>> = HashMap::new();
         for (id, _node) in graph.nodes.iter(){
-            k.insert(id.clone(), vec![]);
+            k.insert(id.clone(), HashSet::new());
         }
         Self{
             data: k,

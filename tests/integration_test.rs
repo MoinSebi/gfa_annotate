@@ -12,7 +12,8 @@ fn test1() -> Result<(), Box<dyn std::error::Error>> {
         .arg("-b")
         .arg("data/example_data/test.bed")
         .arg("-o")
-        .arg("data/output/test.overlap.txt");
+        .arg("data/output/test.overlap.txt")
+        .arg("-f");
     cmd.assert().success();
 
     Ok(())
