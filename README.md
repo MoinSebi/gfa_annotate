@@ -100,4 +100,5 @@ cargo test
 ```
 
 ##TODO
-???
+- [ ] Feature --> Node list (inverse of the output right now)
+- [ ] Report stuff which is not covered by anything (like report all nodes no matter what)
