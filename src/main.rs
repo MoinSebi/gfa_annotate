@@ -10,6 +10,7 @@ use log::{error, info};
 use crate::bed::{BedFile, Node2Feature};
 
 
+
 pub mod bed;
 
 fn main() {
@@ -170,7 +171,7 @@ pub fn bed_intersection<'a>(graph: &'a NGfa, bed: BedFile, path2pos: &'a HashMap
 /// **Arguments**
 /// * index: Index structure for column name
 /// * data: Containing node_id + tags
-pub fn writer_v2(data: Node2Feature, nodes: &HashMap<u32, NNode>, output: &str, len: bool){
+pub fn writer_v2(data: Node2Feature, nodes: &hashbrown::HashMap<u32, NNode>, output: &str, len: bool){
     let f = File::create(output).expect("Unable to create file");
     let mut f = BufWriter::new(f);
     if len{
