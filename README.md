@@ -93,6 +93,21 @@ optional arguments:
 
 ```
 
+### Post-processing:
+If you want the inverse: "Which feature/attribute is covered by which node?", you can use this python script. 
+```text
+usage: attribute2node.py [-h] -i INPUT -o OUTPUT
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        gfa_annotate output file
+  -o OUTPUT, --output OUTPUT
+                        Output file
+
+
+```
+
 ## Testing
 Check out ```./data/exmaple_data/```
 ```text
