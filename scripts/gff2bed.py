@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
 
     logger.info("Read GFF")
-    gff = read_gff(args.gff, True)
+    gff = read_gff(args.gff, args.attribute)
 
     logger.info("Write output BED")
     write_bed(gff, args.output)
