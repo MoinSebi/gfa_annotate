@@ -114,6 +114,16 @@ Check out ```./data/exmaple_data/```
 cargo test
 ```
 
+### Additional information: 
+**How much nodes are not fully covered?**
+
+Annotation from one accession:
+![test2](./plots/fraction_one_accession.png)
+
+Annotation from all accessions:
+![test1!](./plots/fraction_allgenes.png)
+
+
 ## TODO
 - [x] Feature --> Node list (inverse of the output right now)
 - [x] Report stuff which is not covered by anything (like report all nodes no matter what)
