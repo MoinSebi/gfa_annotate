@@ -16,7 +16,7 @@ def read_gff(filename, a = None):
     with open(filename) as file:
         for line in file.readlines():
             lsplit = line.split()
-            if len(lsplit) != 0:
+            if len(lsplit) != 0 and not line.startswith("#"):
                 chr = lsplit[0]
                 start = int(lsplit[3])
                 end = int(lsplit[4])
@@ -54,7 +54,6 @@ def write_bed(data, filename):
     """
     with open(filename, "w") as file:
         for x in data:
-            print(x)
             file.write("\t".join([str(y) for y in x[:3]]) + "\t" + x[3] + "\n")
 
 
