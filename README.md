@@ -72,14 +72,14 @@ With fraction and length:
 
 
 
-#<a id="abcd"></a>gff2bed.py information
+## gff2bed.py information 
 
 **Requirements:**
 - python3
 - argparse
 - logging
 
-
+### Pre-processing: 
 ```text
 usage: gff2bed.py [-h] -g GFF [-a ATTRIBUTE] -o OUTPUT
 
@@ -105,8 +105,10 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         Output file
 
-
 ```
+
+Adding intergenic information to the node -> feature data: 
+
 
 ## Testing
 Check out ```./data/exmaple_data/```
@@ -115,7 +117,7 @@ cargo test
 ```
 
 ### Additional information: 
-**How much nodes are not fully covered?**
+**How many nodes are not fully covered?**
 
 Annotation from one accession:
 ![test2](./plots/fraction_one_accession.png)
@@ -127,3 +129,4 @@ Annotation from all accessions:
 ## TODO
 - [x] Feature --> Node list (inverse of the output right now)
 - [x] Report stuff which is not covered by anything (like report all nodes no matter what)
+- [ ] Update plots + the pipeline the plots were created. 
