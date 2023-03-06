@@ -31,7 +31,7 @@ def write_output(data, filename):
     """
     Writing the bed file
     :param data: the gff file
-    :param filename: the output filenam
+    :param filename: the output filename
     :return:
     """
     with open(filename, "w") as file:
