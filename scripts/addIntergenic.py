@@ -19,6 +19,9 @@ def read_output(filename):
             if len(lsplit) > 1:
                 node = int(lsplit[0])
                 data[node] = lsplit[1].replace("\n", "").split(",")
+            else:
+                data[node] = []
+
     return data
 
 def add_write(data, file_out):
