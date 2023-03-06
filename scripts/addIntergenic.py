@@ -18,7 +18,7 @@ def read_output(filename):
             lsplit = line.split()
             if len(lsplit) > 1:
                 node = int(lsplit[0])
-                data[node] = lsplit[1].replace("\n", "")
+                data[node] = lsplit[1].replace("\n", "").split(",")
     return data
 
 def add_write(data, file_out):
@@ -33,7 +33,7 @@ def add_write(data, file_out):
             if len(value) == 0:
                 print(str(key) + "\t" + "intergenic", file = file)
             else:
-                print(str(key) + "\t" + value, file = file)
+                print(str(key) + "\t" + ",".join([x for x in value]), file = file)
 
 
 if __name__ == "__main__":
