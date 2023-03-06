@@ -20,6 +20,7 @@ def read_output(filename):
                 node = int(lsplit[0])
                 data[node] = lsplit[1].replace("\n", "").split(",")
             else:
+                node = int(lsplit[0])
                 data[node] = []
 
     return data
