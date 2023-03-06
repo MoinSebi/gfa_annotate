@@ -34,3 +34,24 @@ def add_write(data, file_out):
                 print(str(key) + "\t" + "intergenic", file = file)
             else:
                 print(str(key) + "\t" + ",".join([str(x) for x in value]), file = file)
+
+
+if __name__ == "__main__":
+    # Logging
+    logger = logging.getLogger('simple_example')
+    logging.basicConfig(format='%(asctime)s %(message)s')
+    logger.setLevel(logging.INFO)
+    logger.info("Running addIntergenic.py")
+
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", help="gfa_annotate output file", required=True)
+    parser.add_argument("-o", "--output", help="Output file", required=True)
+    args = parser.parse_args()
+
+
+    logger.info("Read file")
+    gff = read_output(args.input)
+
+    logger.info("Write output")
+    add_write(gff, args.output)
